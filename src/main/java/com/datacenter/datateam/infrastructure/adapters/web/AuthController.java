@@ -54,6 +54,7 @@ public class AuthController {
             return ResponseEntity.ok(new LoginResponse(true, "Login exitoso", token));
         }
 
-        return ResponseEntity.status(401).body(new LoginResponse(false, "Credenciales inválidas", ""));
+        return ResponseEntity.status(401).body(new LoginResponse(false, "Credenciales inválidas", null));
+
     }
 }
