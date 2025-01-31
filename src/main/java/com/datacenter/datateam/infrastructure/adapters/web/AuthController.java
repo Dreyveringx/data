@@ -7,12 +7,13 @@ import com.datacenter.datateam.infrastructure.adapters.web.dto.LoginRequest;
 import com.datacenter.datateam.infrastructure.adapters.web.dto.LoginResponse;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/datateam.")
+@RequestMapping("/api/datateam")
 public class AuthController {
     private final LoginService loginService;
     private final DocumentTypeRepositoryPort documentTypeRepository;
@@ -32,16 +33,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        boolean isAuthenticated = loginService.authenticate(
-            request.documentTypeId(),
-            request.documentNumber(),
-            request.password()
-        );
+public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    boolean isAuthenticated = loginService.authenticate(
+        request.getDocumentTypeId(),
+        request.getDocumentNumber(),
+        request.getPassword()
+    );
 
-        if (isAuthenticated) {
-            return ResponseEntity.ok(new LoginResponse(true, "Login exitoso"));
-        }
-        return ResponseEntity.status(401).body(new LoginResponse(false, "Credenciales inválidas"));
-    }
+    if (isAuthenticated) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getDocumentNumber());
+        String token = jwtTokenProvider.generateToken(userDetails);
+        return ResponseEntity.ok(new LoginResponse(true, "Login exitoso", token));
+    }
+    
+    return ResponseEntity.status(401).body(new LoginResponse(false, "Credenciales inválidas", null));
+}
+
 }

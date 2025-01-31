@@ -13,9 +13,6 @@ public interface JpaUserRepository extends JpaRepository<User, Long>, UserReposi
 
     @Override
     default Optional<User> findByDocumentTypeAndDocumentNumber(Long documentTypeId, String documentNumber) {
-        
         return findByDocumentTypeAndDocumentNumber(documentTypeId, documentNumber);
-    }
-
-    Optional<User> findByDocumentTypeAndDocumentNumber(Long documentTypeId, String documentNumber);
+    };
 }
